@@ -3,6 +3,7 @@ extends Resource
 
 @export var id: String = ""
 @export var display_name: String = ""
+@export var role: String = ""
 @export var color: Color = Color.WHITE
 @export var max_health: float = 100.0
 @export var attack_damage: float = 10.0

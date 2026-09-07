@@ -1,4 +1,4 @@
-# Assets Guide - Auto-Battler
+# Assets Guide - Auto-Battler (Hello Kitty)
 
 ## Sprites de Personajes (32x32 o 64x64 px)
 Cada personaje necesita un sprite sheet o sprite individual con estas animaciones:
@@ -8,17 +8,21 @@ Cada personaje necesita un sprite sheet o sprite individual con estas animacione
 - death (3-4 frames)
 - ability (3-4 frames)
 
-### Personajes:
-1. **knight.png** - Caballero con armadura azul
-2. **ninja.png** - Ninja oscuro
-3. **mage.png** - Mago púrpura con bata
-4. **berserker.png** - Berserker rojo con hacha
-5. **healer.png** - Sanador verde con bastón
-6. **assassin.png** - Asesino morado con dagas
-7. **tank.png** - Tanque gris con escudo grande
-8. **archer.png** - Arquero verde con arco
-9. **jester.png** - Bufón naranja con gorro
-10. **sleeper.png** - Dormilón azul con pijama
+### Personajes (estilo cutes pero la idea es que luzcan "shonen"):
+1. **pompompurin.png** - Perrito golden retriever con boina azul, gordito
+2. **pochacco.png** - Perrito blanco con orejas caídas, atlético
+3. **badtz.png** - Pingüino negro con mohawk, actitud de chico malo
+4. **hangyodon.png** - Pez azul solitario, con botella de cerveza
+5. **melody.png** - Conejita blanca con capucha rosa, encantadora
+6. **gudetama.png** - Yema de huevo perezosa con cara triste
+7. **cinnamoroll.png** - Perrito blanco con orejas largas, chiquito
+8. **tuxedosam.png** - Pingüino gordo con moño, tanque
+9. **kuromi.png** - Conejita negra con cráneo en la frente, traviesa
+10. **kitty.png** - Gata blanca con moño rojo (hellokitty-style)
+
+## Estados ESPECIALES (sprites extra o tint)
+- **kitty_demon.png** - Hello Kitty con ojos rojos brillantes, modo demonio
+- **gudetama_sleep.png** - Gudetama con burbujas Zzz
 
 ## UI Elements
 - **btn_normal.png** - Botón normal (state)
@@ -30,13 +34,16 @@ Cada personaje necesita un sprite sheet o sprite individual con estas animacione
 - **ability_bar_bg.png** - Fondo de barra de cooldown
 - **ability_bar_fill.png** - Relleno de barra de cooldown
 
-## Partículas
+## Partículas / Efectos
 - **hit_spark.png** - Chispa de impacto (8x8 o 16x16)
 - **crit_spark.png** - Chispa de crítico (más grande)
-- **heal_particles.png** - Partículas de curación (+ verdes)
-- **death_bones.png** - Partículas de muerte
-- **poison_bubble.png** - Burbujas de veneno
-- **fire_particle.png** - Partícula de fuego (para mago)
+- **pudding.png** - Pudin para Pompompurin
+- **ball.png** - Pelota de Pochacco
+- **beer.png** - Cerveza para Hangyodon
+- **heart.png** - Corazón para encanto de My Melody
+- **zzz.png** - Burbuja de sueño para Gudetama
+- **shadow.png** - Sombra de Cinnamoroll
+- **skull.png** - Cráneo para Kuromi
 
 ## Fondos
 - **battle_bg.png** - Fondo de arena de batalla (1920x1080)
@@ -50,4 +57,4 @@ Cada personaje necesita un sprite sheet o sprite individual con estas animacione
 - Formato PNG con transparencia
 - Colores vibrantes y saturados (estilo cartoon)
 - Los sprites deben ser legibles a 32x32 px
-- Pixel art bien definido o vectorial limpio
+- La idea es que parezcan personajes "shonen" cuando pelean (juice exagerado)

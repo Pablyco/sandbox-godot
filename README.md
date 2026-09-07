@@ -1,6 +1,7 @@
-# Auto-Battler Sandbox
+# Auto-Battler Sandbox (Hello Kitty Universe)
 
-Minijuego de auto-battler 2D para YouTube, hecho en Godot 4.7.1.
+Un juego de auto-battler 2D **ultra masculino** con personajes del universo Hello Kitty.
+Proyecto fan hecho para YouTube. No publicar ni compartir.
 
 ## Modos de Juego
 
@@ -11,16 +12,19 @@ Seleccioná 2 peleadores y mirá quién gana.
 10 peleadores aleatorios se enfrentan. Mirá el ranking en tiempo real.
 
 ## Personajes
-1. **Caballero** - Tanque con bloqueo
-2. **Ninja** - Daño alto, shuriken
-3. **Mago** - Bola de fuego masiva
-4. **Berserker** - Frenesí suicida
-5. **Sanador** - Se cura
-6. **Asesino** - Veneno
-7. **Tanque** - Invulnerabilidad
-8. **Arquero** - Lluvia de flechas
-9. **Bufón** - Roba ataque
-10. **Dormilón** - Se cura cuando lo golpean
+
+| # | Personaje | Rol | Habilidad |
+|---|-----------|-----|-----------|
+| 1 | **Pompompurin** | Tanque Enojón | Comer pudin + enojarse (+80% daño 5s) |
+| 2 | **Pochacco** | Atleta Violento | Pelotaza (daño x2 + stun 1s) |
+| 3 | **BADTZ-MARU** | Rebelde Giratorio | Patada giratoria (daño AoE) |
+| 4 | **Hangyodon** | Borracho Vomitín | Vomitar cerveza (daño + baja accuracy) |
+| 5 | **My Melody** | Femme Fatale | Encantar (enemigo no la ataca 3s) |
+| 6 | **Gudetama** | Perezoso Cósmico | Pereza contagiosa (ralentiza cercanos) |
+| 7 | **Cinnamoroll** | Kamikaze Celestial | Vuela y explota (daño x3, autolesión) |
+| 8 | **Tuxedosam** | Tanque Abrumador | Plancha (daño masivo AoE) |
+| 9 | **Kuromi** | Provocadora Psicópata | Provocación (devuelve doble daño) |
+| 10 | **Hello Kitty** | Demonio Cute | Modo Demonio (combo de puñetazos) |
 
 ## Controles
 - **Scroll**: Zoom in/out

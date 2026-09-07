@@ -65,21 +65,40 @@ func _update_previews() -> void:
 
 func _set_preview(panel: PanelContainer, char_data: CharacterData) -> void:
 	var label = panel.get_node_or_null("VBoxContainer/NameLabel")
+	var role_label = panel.get_node_or_null("VBoxContainer/RoleLabel")
 	var stats = panel.get_node_or_null("VBoxContainer/StatsLabel")
+	var ability = panel.get_node_or_null("VBoxContainer/AbilityLabel")
 	if label:
 		label.text = char_data.display_name
 		label.add_theme_color_override("font_color", char_data.color)
+	if role_label:
+		role_label.text = char_data.role
+		role_label.add_theme_color_override("font_color", Color(0.8, 0.8, 1.0))
 	if stats:
-		stats.text = "HP: %d | ATK: %d | SPD: %.1f" % [int(char_data.max_health), int(char_data.attack_damage), char_data.attack_speed]
+		stats.text = "HP: %d | ATK: %d | SPD: %.1f | CRIT: %d%%" % [
+			int(char_data.max_health),
+			int(char_data.attack_damage),
+			char_data.attack_speed,
+			int(char_data.crit_chance * 100)
+		]
+	if ability:
+		ability.text = "%s (CD %ds): %s" % [char_data.ability_name, int(char_data.ability_cooldown), char_data.ability_description]
+		ability.add_theme_color_override("font_color", Color(1.0, 0.85, 0.3))
 
 func _clear_preview(panel: PanelContainer) -> void:
 	var label = panel.get_node_or_null("VBoxContainer/NameLabel")
+	var role_label = panel.get_node_or_null("VBoxContainer/RoleLabel")
 	var stats = panel.get_node_or_null("VBoxContainer/StatsLabel")
+	var ability = panel.get_node_or_null("VBoxContainer/AbilityLabel")
 	if label:
 		label.text = "---"
 		label.add_theme_color_override("font_color", Color.WHITE)
+	if role_label:
+		role_label.text = ""
 	if stats:
 		stats.text = ""
+	if ability:
+		ability.text = ""
 
 func _update_selection_label() -> void:
 	if selection_label:

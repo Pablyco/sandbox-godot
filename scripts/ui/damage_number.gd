@@ -43,6 +43,14 @@ func setup_ability(text: String) -> void:
 		scale = Vector2(1.5, 1.5)
 	_animate()
 
+func setup_counter(amount: float) -> void:
+	if label:
+		label.text = "REFLECT -" + str(int(amount))
+		label.add_theme_font_size_override("font_size", 26)
+		label.modulate = Color(1.0, 0.3, 1.0)
+		scale = Vector2(1.4, 1.4)
+	_animate()
+
 func _animate() -> void:
 	var tween = create_tween()
 	tween.set_parallel(true)
