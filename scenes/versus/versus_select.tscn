@@ -36,7 +36,7 @@ horizontal_alignment = 1
 
 [node name="SelectionLabel" type="Label" parent="PanelContainer/VBoxContainer"]
 layout_mode = 2
-text = "Seleccioná 2 personajes (0/2)"
+text = "Select 2 fighters (0/2)"
 horizontal_alignment = 1
 
 [node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer"]

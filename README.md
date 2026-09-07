@@ -1,36 +1,36 @@
 # Auto-Battler Sandbox (Hello Kitty Universe)
 
-Un juego de auto-battler 2D **ultra masculino** con personajes del universo Hello Kitty.
-Proyecto fan hecho para YouTube. No publicar ni compartir.
+A 2D auto-battler game, **ultra masculine**, featuring Hello Kitty universe characters.
+Fan project for YouTube. Not for public distribution.
 
-## Modos de Juego
+## Game Modes
 
 ### Versus
-Seleccioná 2 peleadores y mirá quién gana.
+Select 2 fighters and watch who wins.
 
-### Batalla Campal
-10 peleadores aleatorios se enfrentan. Mirá el ranking en tiempo real.
+### Battle Royale
+10 random fighters fight it out. Watch the live leaderboard.
 
-## Personajes
+## Characters
 
-| # | Personaje | Rol | Habilidad |
-|---|-----------|-----|-----------|
-| 1 | **Pompompurin** | Tanque Enojón | Comer pudin + enojarse (+80% daño 5s) |
-| 2 | **Pochacco** | Atleta Violento | Pelotaza (daño x2 + stun 1s) |
-| 3 | **BADTZ-MARU** | Rebelde Giratorio | Patada giratoria (daño AoE) |
-| 4 | **Hangyodon** | Borracho Vomitín | Vomitar cerveza (daño + baja accuracy) |
-| 5 | **My Melody** | Femme Fatale | Encantar (enemigo no la ataca 3s) |
-| 6 | **Gudetama** | Perezoso Cósmico | Pereza contagiosa (ralentiza cercanos) |
-| 7 | **Cinnamoroll** | Kamikaze Celestial | Vuela y explota (daño x3, autolesión) |
-| 8 | **Tuxedosam** | Tanque Abrumador | Plancha (daño masivo AoE) |
-| 9 | **Kuromi** | Provocadora Psicópata | Provocación (devuelve doble daño) |
-| 10 | **Hello Kitty** | Demonio Cute | Modo Demonio (combo de puñetazos) |
+| # | Character | Role | Ability |
+|---|-----------|------|---------|
+| 1 | **Pompompurin** | Angry Chunky Boy | Eat pudding + rage (+80% dmg 5s) |
+| 2 | **Pochacco** | Violent Athlete | Big ball toss (x2 dmg + stun) |
+| 3 | **BADTZ-MARU** | Spinning Rebel | Spin kick (AoE damage) |
+| 4 | **Hangyodon** | Sloppy Drunk | Beer vomit (dmg + accuracy debuff) |
+| 5 | **My Melody** | Femme Fatale | Charm (enemy can't attack her) |
+| 6 | **Gudetama** | Cosmic Lazy Boy | Contagious laziness (slow nearby) |
+| 7 | **Cinnamoroll** | Heavenly Kamikaze | Kamikaze flight (x3 dmg, self-hurt) |
+| 8 | **Tuxedosam** | Overwhelming Tank | Stomp (massive AoE) |
+| 9 | **Kuromi** | Psycho Provoker | Provoke (reflects 2x damage) |
+| 10 | **Hello Kitty** | Cute Demon | Demon Mode (hypervelocity punch combo) |
 
-## Controles
+## Controls
 - **Scroll**: Zoom in/out
-- **Click medio + arrastrar**: Mover cámara
-- **ESC**: Volver al menú
+- **Middle click + drag**: Move camera
+- **ESC**: Back to menu
 
-## Desarrollo
-- Rama `develop` para trabajo activo
-- Rama `main` para versiones estables
+## Development
+- Branch `develop` for active work
+- Branch `main` for stable versions

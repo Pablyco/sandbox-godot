@@ -13,6 +13,15 @@ var ability_timer: float = 0.0
 var attack_timer: float = 0.0
 var is_alive: bool = true
 
+# Movimiento
+const MELEE_RANGE: float = 70.0
+const KNOCKBACK_FORCE: float = 180.0
+const KNOCKBACK_DAMPING: float = 6.0
+var move_speed: float = 120.0
+var velocity_vec: Vector2 = Vector2.ZERO
+var knockback_velocity: Vector2 = Vector2.ZERO
+var facing: int = 1  # 1 = derecha, -1 = izquierda
+
 # Estados especiales
 var rage_mode: bool = false
 var rage_timer: float = 0.0
@@ -33,7 +42,8 @@ var is_stunned: bool = false
 var stun_timer: float = 0.0
 var blocked_next_attack: bool = false
 
-@onready var sprite: ColorRect = $Sprite
+@onready var sprite: ColorRect = $SpriteContainer/Sprite
+@onready var sprite_container: Node2D = $SpriteContainer
 @onready var health_bar: ProgressBar = $HealthBar
 @onready var name_label: Label = $NameLabel
 @onready var ability_cooldown_bar: ProgressBar = $AbilityCooldownBar
@@ -44,16 +54,54 @@ func setup(char_data: CharacterData) -> void:
 	current_health = max_health
 	attack_timer = 1.0 / data.attack_speed
 	ability_timer = data.ability_cooldown * randf_range(0.3, 1.0)
+	move_speed = data.move_speed
+	_update_ui()
+
+func _physics_process(delta: float) -> void:
+	if not is_alive:
+		return
+
+	_update_timers(delta)
+
+	# Movimiento: acercarse al enemigo más cercano hasta estar en rango melee
+	var target = _get_attack_target()
+	if target != null and not is_stunned and not is_charmed:
+		var to_target = target.global_position - global_position
+		var dist = to_target.length()
+
+		if dist > MELEE_RANGE:
+			var dir = to_target.normalized()
+			var speed = move_speed
+			if is_slowed:
+				speed *= slow_amount
+			velocity_vec = dir * speed
+		else:
+			velocity_vec = Vector2.ZERO
+		facing = 1 if to_target.x >= 0 else -1
+	elif not is_stunned:
+		velocity_vec = Vector2.ZERO
+
+	# Aplicar knockback (decae con el tiempo)
+	if knockback_velocity.length() > 5:
+		velocity_vec += knockback_velocity
+		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, KNOCKBACK_DAMPING * delta)
+	else:
+		knockback_velocity = Vector2.ZERO
+
+	if is_stunned:
+		velocity_vec = knockback_velocity
+
+	velocity = velocity_vec
+	move_and_slide()
+
+	_update_sprite_scale()
 	_update_ui()
 
 func _process(delta: float) -> void:
 	if not is_alive:
 		return
 
-	_update_timers(delta)
-
 	if is_stunned or is_charmed:
-		_update_ui()
 		return
 
 	ability_timer -= delta
@@ -64,13 +112,23 @@ func _process(delta: float) -> void:
 		ability_timer = data.ability_cooldown
 
 	if attack_timer <= 0:
-		_try_attack()
-		var effective_speed = data.attack_speed
-		if is_slowed:
-			effective_speed *= slow_amount
-		attack_timer = 1.0 / effective_speed
+		if _is_in_melee_range():
+			_try_attack()
+			var effective_speed = data.attack_speed
+			if is_slowed:
+				effective_speed *= slow_amount
+			attack_timer = 1.0 / effective_speed
 
-	_update_ui()
+func _get_attack_target() -> Fighter:
+	if is_charmed and charmed_by and charmed_by.is_alive:
+		return charmed_by
+	return _find_nearest_enemy()
+
+func _is_in_melee_range() -> bool:
+	var target = _get_attack_target()
+	if target == null:
+		return false
+	return global_position.distance_to(target.global_position) <= MELEE_RANGE + 20
 
 func _update_timers(delta: float) -> void:
 	# Rage mode (Pompompurin)
@@ -119,19 +177,14 @@ func _update_timers(delta: float) -> void:
 			is_stunned = false
 
 func _try_attack() -> void:
-	var target: Fighter
-	if is_charmed and charmed_by and charmed_by.is_alive:
-		# Si está encantado, ataca a aliados (en el 1v1 se ignora)
-		target = charmed_by
-	else:
-		target = _find_nearest_enemy()
-
+	var target = _get_attack_target()
 	if target == null:
 		return
 
 	var effective_hit = data.hit_chance - accuracy_debuff
 	if not _roll_hit_with(effective_hit):
 		_show_miss_number()
+		_juice_windup()
 		return
 
 	var dmg = data.attack_damage * rage_damage_mult
@@ -139,11 +192,19 @@ func _try_attack() -> void:
 	if is_crit:
 		dmg *= 3.0
 
-	# Cinnamoroll: daño bonus por velocidad
+	# Cinnamoroll: damage bonus for speed
 	if data.id == "cinnamoroll":
 		dmg *= 1.2
 
+	# Aplicar knockback al enemigo (con fuerza extra si es critico)
+	var knockback_dir = (target.global_position - global_position).normalized()
+	var kb_force = KNOCKBACK_FORCE
+	if is_crit:
+		kb_force *= 1.5
+	target._apply_knockback(knockback_dir, kb_force)
+
 	target._take_damage(dmg)
+	_juice_attack_animation(target)
 	attack_landed.emit(self, target, dmg, is_crit)
 
 func _use_ability() -> void:
@@ -176,102 +237,105 @@ func _use_ability() -> void:
 # --- HABILIDADES ---
 
 func _ability_pompompurin() -> void:
-	# Se come el pudin, se enoja: +80% daño por 5 segundos
 	current_health = minf(current_health + max_health * 0.15, max_health)
 	rage_mode = true
 	rage_timer = 5.0
 	rage_damage_mult = 1.8
-	_show_ability_text("¡ME COMÍ EL PUDDING!")
+	_show_ability_text("ATE MY PUDDING!")
 	_show_heal_number(max_health * 0.15)
 	_juice_enrage()
 
 func _ability_pochacco() -> void:
-	# Tira pelotaza al más cercano: daño x2 + stun 1s
 	var target = _find_nearest_enemy()
 	if target:
 		var dmg = data.attack_damage * 2.0
 		target._take_damage(dmg)
 		target._apply_stun(1.0)
-		_show_ability_text("¡OLÉ!")
+		var kb_dir = (target.global_position - global_position).normalized()
+		target._apply_knockback(kb_dir, KNOCKBACK_FORCE * 2.0)
+		_show_ability_text("OLÉ!")
 		_attack_towards(target.global_position)
 
 func _ability_badtz() -> void:
-	# Patada giratoria: daño AoE a todos los cercanos
+	var dmg = data.attack_damage * 1.5
 	for e in _get_all_enemies():
 		var dist = global_position.distance_to(e.global_position)
 		if dist < 200:
-			e._take_damage(data.attack_damage * 1.5)
-	_show_ability_text("¡PATADA GIRATORIA!")
+			e._take_damage(dmg)
+			var kb_dir = (e.global_position - global_position).normalized()
+			e._apply_knockback(kb_dir, KNOCKBACK_FORCE)
+	_show_ability_text("SPIN KICK!")
 	_juice_spin()
 
 func _ability_hangyodon() -> void:
-	# Vomita cerveza: daño + baja accuracy 40% por 4s
 	for e in _get_all_enemies():
 		e._take_damage(data.attack_damage * 0.8)
 		e.accuracy_debuff = 0.4
 		e.accuracy_debuff_timer = 4.0
-	_show_ability_text("¡TRAGO AMARGO!")
+	_show_ability_text("BITTER DRINK!")
 	_juice_vomit()
 
 func _ability_melody() -> void:
-	# Encanta al más cercano: no puede atacar por 3s
 	var target = _find_nearest_enemy()
 	if target:
 		target.is_charmed = true
 		target.charmed_by = self
 		target.charm_timer = 3.0
-		_show_ability_text("ENCANTO~")
+		_show_ability_text("CHARM~")
 		_show_charm_effect(target)
 
 func _ability_gudetama() -> void:
-	# Pereza contagiosa: ralentiza a todos los cercanos 40% por 4s
 	for e in _get_all_enemies():
-		e.is_slowed = true
-		e.slow_timer = 4.0
-		e.slow_amount = 0.6
-	_show_ability_text("HAGAMOS LO...")
-	_show_ability_text("...NADA")
+		var dist = global_position.distance_to(e.global_position)
+		if dist < 250:
+			e.is_slowed = true
+			e.slow_timer = 4.0
+			e.slow_amount = 0.6
+	_show_ability_text("NAPS TIME...")
 	_juice_sleep()
 
 func _ability_cinnamoroll() -> void:
-	# Kamikaze: vuela al más cercano, daño x3 pero autolesión 20%
 	var target = _find_nearest_enemy()
 	if target:
 		var dmg = data.attack_damage * 3.0
 		target._take_damage(dmg)
 		_take_damage_no_evade(max_health * 0.2)
-		_show_ability_text("¡KAMIKAZE!")
+		var kb_dir = (target.global_position - global_position).normalized()
+		target._apply_knockback(kb_dir, KNOCKBACK_FORCE * 2.5)
+		_show_ability_text("KAMIKAZE!")
 		_attack_towards(target.global_position)
 		_juice_dash()
 
 func _ability_tuxedosam() -> void:
-	# Plancha: salta y daño masivo en área
+	var dmg = data.attack_damage * 2.5
 	for e in _get_all_enemies():
 		var dist = global_position.distance_to(e.global_position)
 		if dist < 250:
-			e._take_damage(data.attack_damage * 2.5)
-	_show_ability_text("¡PLANCHAAAA!")
+			e._take_damage(dmg)
+			var kb_dir = Vector2.UP + (e.global_position - global_position).normalized() * 0.3
+			e._apply_knockback(kb_dir.normalized(), KNOCKBACK_FORCE * 1.8)
+	_show_ability_text("PLANCHAAA!")
 	_juice_slam()
 
 func _ability_kuromi() -> void:
-	# Provocación: si la atacan, devuelve doble daño por 3s
 	is_counter_stance = true
 	counter_timer = 3.0
-	_show_ability_text("¿ME PEGÁS?")
+	_show_ability_text("HIT ME!?")
 	_juice_taunt()
 
 func _ability_kitty() -> void:
-	# Modo demonio: combo de puñetazos hipervelocity a todos
 	is_demon_mode = true
 	demon_timer = 3.0
+	_show_ability_text("DEMON MODE")
+	_juice_demon()
 	for e in _get_all_enemies():
 		for i in range(5):
 			var dmg = data.attack_damage * 0.6
 			await get_tree().create_timer(0.15).timeout
 			if is_alive and e.is_alive:
 				e._take_damage(dmg)
-	_show_ability_text("MODO DEMONIO")
-	_juice_demon()
+				var kb_dir = (e.global_position - global_position).normalized()
+				e._apply_knockback(kb_dir, KNOCKBACK_FORCE * 0.6)
 
 # --- SISTEMA DE DAÑO ---
 
@@ -284,13 +348,12 @@ func _take_damage(amount: float) -> void:
 		var attacker = _find_nearest_enemy()
 		if attacker:
 			attacker._take_damage(amount * 2.0)
-			_show_ability_text("¡REFLEJO!")
+			_show_ability_text("REFLECT!")
 			_show_counter_number(amount * 2.0)
 		_show_absorbed_number()
 		is_counter_stance = false
 		return
 
-	# Bloqueo (ya no hay knight, pero por si acaso)
 	if blocked_next_attack:
 		blocked_next_attack = false
 		_show_absorbed_number()
@@ -310,6 +373,12 @@ func _take_damage_no_evade(amount: float) -> void:
 		is_alive = false
 		died.emit(self)
 		_juice_death()
+
+func _apply_knockback(direction: Vector2, force: float) -> void:
+	if not is_alive:
+		return
+	knockback_velocity += direction * force
+	_juice_knockback()
 
 func _apply_stun(duration: float) -> void:
 	is_stunned = true
@@ -398,7 +467,7 @@ func _show_charm_effect(target: Fighter) -> void:
 	var dn = _get_damage_number_scene()
 	if dn:
 		dn.position = target.global_position + Vector2(0, -40)
-		dn.setup_ability("ENAMORADO~")
+		dn.setup_ability("IN LOVE~")
 
 func _get_damage_number_scene():
 	var scene = get_tree().current_scene
@@ -410,6 +479,15 @@ func _get_damage_number_scene():
 	return dn
 
 # --- UI ---
+
+func _update_sprite_scale() -> void:
+	# El flip se aplica al contenedor; los tweens de squash van al Sprite hijo
+	if sprite_container:
+		var target_scale = Vector2.ONE
+		var motion = velocity_vec.length() / maxf(move_speed, 1.0)
+		if motion > 0.2:
+			target_scale = Vector2(1.0 + motion * 0.15, 1.0 - motion * 0.15)
+		sprite_container.scale = Vector2(target_scale.x * facing, target_scale.y)
 
 func _update_ui() -> void:
 	if health_bar:
@@ -438,6 +516,12 @@ func _juice_hit() -> void:
 		var tween = create_tween()
 		tween.tween_property(sprite, "scale", Vector2(1.2, 0.8), 0.05)
 		tween.tween_property(sprite, "scale", Vector2.ONE, 0.1)
+
+func _juice_knockback() -> void:
+	if sprite:
+		var tween = create_tween()
+		tween.tween_property(sprite, "rotation", facing * deg_to_rad(10), 0.05)
+		tween.tween_property(sprite, "rotation", 0.0, 0.1)
 
 func _juice_pulse() -> void:
 	if sprite:
@@ -500,6 +584,19 @@ func _juice_demon() -> void:
 		var tween = create_tween().set_loops(3)
 		tween.tween_property(sprite, "modulate", Color(1, 0, 0), 0.1)
 		tween.tween_property(sprite, "modulate", Color(1, 0.5, 0.5), 0.1)
+
+func _juice_attack_animation(target: Fighter) -> void:
+	if sprite:
+		var tween = create_tween()
+		var target_dir = signf(target.global_position.x - global_position.x)
+		tween.tween_property(sprite, "position:x", sprite.position.x + target_dir * 12, 0.06)
+		tween.tween_property(sprite, "position:x", sprite.position.x, 0.1)
+
+func _juice_windup() -> void:
+	if sprite:
+		var tween = create_tween()
+		tween.tween_property(sprite, "rotation", deg_to_rad(-12), 0.08)
+		tween.tween_property(sprite, "rotation", 0.0, 0.1)
 
 func _attack_towards(target_pos: Vector2) -> void:
 	if sprite:

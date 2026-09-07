@@ -34,7 +34,7 @@ offset_left = -160.0
 offset_top = 10.0
 offset_right = -10.0
 offset_bottom = 50.0
-text = "ESC: Volver"
+text = "ESC: Back"
 
 [node name="RankingPanel" type="PanelContainer" parent="UILayer"]
 visible = true

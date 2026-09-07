@@ -31,20 +31,20 @@ alignment = 1
 
 [node name="TitleLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-text = "BATALLA CAMPAL"
+text = "BATTLE ROYALE"
 horizontal_alignment = 1
 
 [node name="InfoLabel" type="Label" parent="VBoxContainer"]
 layout_mode = 2
-text = "10 peleadores aleatorios"
+text = "10 random fighters, last one standing"
 horizontal_alignment = 1
 
 [node name="StartButton" type="Button" parent="VBoxContainer"]
 custom_minimum_size = Vector2(300, 60)
 layout_mode = 2
-text = "¡INICIAR BATALLA!"
+text = "START BATTLE!"
 
 [node name="BackButton" type="Button" parent="VBoxContainer"]
 custom_minimum_size = Vector2(300, 60)
 layout_mode = 2
-text = "VOLVER"
+text = "BACK"

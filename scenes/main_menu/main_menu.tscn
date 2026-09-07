@@ -50,5 +50,5 @@ custom_minimum_size = Vector2(300, 60)
 
 [node name="BattlefieldButton" type="Button" parent="VBoxContainer"]
 layout_mode = 2
-text = "BATALLA CAMPAL"
+text = "BATTLE ROYALE"
 custom_minimum_size = Vector2(300, 60)

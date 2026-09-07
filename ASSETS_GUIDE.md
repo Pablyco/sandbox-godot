@@ -1,60 +1,65 @@
 # Assets Guide - Auto-Battler (Hello Kitty)
 
-## Sprites de Personajes (32x32 o 64x64 px)
-Cada personaje necesita un sprite sheet o sprite individual con estas animaciones:
-- idle (2-4 frames)
-- attack (3-4 frames)
-- hurt (1-2 frames)
-- death (3-4 frames)
-- ability (3-4 frames)
+## CAMBIO IMPORTANTE - Scope reducido de arte
+Para ahorrarte tiempo (producción de 3 días), cada personaje necesita SOLO:
 
-### Personajes (estilo cutes pero la idea es que luzcan "shonen"):
-1. **pompompurin.png** - Perrito golden retriever con boina azul, gordito
-2. **pochacco.png** - Perrito blanco con orejas caídas, atlético
-3. **badtz.png** - Pingüino negro con mohawk, actitud de chico malo
-4. **hangyodon.png** - Pez azul solitario, con botella de cerveza
-5. **melody.png** - Conejita blanca con capucha rosa, encantadora
-6. **gudetama.png** - Yema de huevo perezosa con cara triste
-7. **cinnamoroll.png** - Perrito blanco con orejas largas, chiquito
-8. **tuxedosam.png** - Pingüino gordo con moño, tanque
-9. **kuromi.png** - Conejita negra con cráneo en la frente, traviesa
-10. **kitty.png** - Gata blanca con moño rojo (hellokitty-style)
+### Por personaje (2 archivos):
+1. **`<id>_idle.png`** - UN sprite estático (32x32 o 64x64 px). Esta es la imagen base del personaje.
+2. **`<id>_ability.png`** - UN sprite sheet (3-4 frames) SOLO para la habilidad especial.
 
-## Estados ESPECIALES (sprites extra o tint)
-- **kitty_demon.png** - Hello Kitty con ojos rojos brillantes, modo demonio
-- **gudetama_sleep.png** - Gudetama con burbujas Zzz
+TODAS las demás animaciones (idle bob, ataque, recibir daño, muerte, movimiento, knockback, etc.)
+se hacen con **tweens en código** sobre el sprite estático. No necesitás frames para esas.
+
+### Personajes:
+1. **pompompurin_idle.png** - Perrito golden retriever con boina azul, gordito
+2. **pochacco_idle.png** - Perrito blanco con orejas caídas, atlético
+3. **badtz_idle.png** - Pingüino negro con mohawk, actitud de chico malo
+4. **hangyodon_idle.png** - Pez azul solitario con botella de cerveza
+5. **melody_idle.png** - Conejita blanca con capucha rosa, encantadora
+6. **gudetama_idle.png** - Yema de huevo perezosa con cara triste
+7. **cinnamoroll_idle.png** - Perrito blanco con orejas largas, chiquito
+8. **tuxedosam_idle.png** - Pingüino gordo con moño
+9. **kuromi_idle.png** - Conejita negra con cráneo en la frente
+10. **kitty_idle.png** - Gata blanca con moño rojo
+
+### Sprites de habilidad (sprite sheets de 3-4 frames cada uno):
+- **pompompurin_ability.png** - Comiendo su pudin (pudin en mano)
+- **pochacco_ability.png** - Tirando un pelotazo con fuerza
+- **badtz_ability.png** - Posición de patada giratoria
+- **hangyodon_ability.png** - Vomitando cerveza
+- **melody_ability.png** - Lanzando un encanto de corazón
+- **gudetama_ability.png** - Bostezando/rindiéndose con burbuja Zzz
+- **cinnamoroll_ability.png** - Volando en picada de kamikaze
+- **tuxedosam_ability.png** - Saltando con todo el peso cayendo
+- **kuromi_ability.png** - Provocando con sonrisa malvada
+- **kitty_ability.png** - Arrancándose el moño, ojos rojos demoníacos
+
+## Sistema de sprites (importante)
+Los sprites se cargan desde `assets/sprites/<id>_idle.png`.
+El tint de color por personaje se aplica EN CÓDIGO para estados especiales
+(rage = naranja, demon = rojo, etc.), así que NO necesitás versiones tintadas.
 
 ## UI Elements
-- **btn_normal.png** - Botón normal (state)
+- **btn_normal.png** - Botón normal
 - **btn_hover.png** - Botón hover
 - **btn_pressed.png** - Botón presionado
 - **health_bar_bg.png** - Fondo de barra de vida
 - **health_bar_fill.png** - Relleno de barra de vida
-- **health_bar_crit.png** - Relleno para daño crítico
 - **ability_bar_bg.png** - Fondo de barra de cooldown
 - **ability_bar_fill.png** - Relleno de barra de cooldown
 
-## Partículas / Efectos
-- **hit_spark.png** - Chispa de impacto (8x8 o 16x16)
+## Partículas / Efectos (opcional, prioridad baja)
+- **hit_spark.png** - Chispa de impacto
 - **crit_spark.png** - Chispa de crítico (más grande)
-- **pudding.png** - Pudin para Pompompurin
-- **ball.png** - Pelota de Pochacco
-- **beer.png** - Cerveza para Hangyodon
 - **heart.png** - Corazón para encanto de My Melody
 - **zzz.png** - Burbuja de sueño para Gudetama
-- **shadow.png** - Sombra de Cinnamoroll
-- **skull.png** - Cráneo para Kuromi
 
 ## Fondos
 - **battle_bg.png** - Fondo de arena de batalla (1920x1080)
 - **menu_bg.png** - Fondo del menú principal
 
-## UI Screens
-- **victory_bg.png** - Fondo de pantalla de victoria
-- **select_bg.png** - Fondo de selección de personajes
-
 ## Notas:
 - Formato PNG con transparencia
-- Colores vibrantes y saturados (estilo cartoon)
-- Los sprites deben ser legibles a 32x32 px
-- La idea es que parezcan personajes "shonen" cuando pelean (juice exagerado)
+- Colores vibrantes (estilo cartoon)
+- Sprites legibles a 32x32 px
+- Las habilidades especiales las anima el usuario a mano en Godot

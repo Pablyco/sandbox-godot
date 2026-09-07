@@ -102,7 +102,7 @@ func _clear_preview(panel: PanelContainer) -> void:
 
 func _update_selection_label() -> void:
 	if selection_label:
-		selection_label.text = "Seleccioná 2 personajes (%d/2)" % selected.size()
+		selection_label.text = "Select 2 fighters (%d/2)" % selected.size()
 
 func _on_fight_pressed() -> void:
 	if selected.size() != 2:

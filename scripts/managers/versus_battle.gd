@@ -25,13 +25,13 @@ func _spawn_fighters() -> void:
 		return
 
 	fighter1 = fighter_scene.instantiate()
-	fighter1.global_position = Vector2(400, 540)
+	fighter1.global_position = Vector2(860, 540)
 	fighters_node.add_child(fighter1)
 	fighter1.setup(gs.versus_p1)
 	fighter1.died.connect(_on_fighter_died)
 
 	fighter2 = fighter_scene.instantiate()
-	fighter2.global_position = Vector2(1520, 540)
+	fighter2.global_position = Vector2(1060, 540)
 	fighters_node.add_child(fighter2)
 	fighter2.setup(gs.versus_p2)
 	fighter2.died.connect(_on_fighter_died)

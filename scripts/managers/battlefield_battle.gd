@@ -150,7 +150,7 @@ func _update_ranking() -> void:
 
 	for i in range(placement_order.size()):
 		var place = alive_fighters.size() + i + 1
-		text += "#%d %s [ELIMINADO]\n" % [place, placement_order[i].display_name]
+		text += "#%d %s [ELIMINATED]\n" % [place, placement_order[i].display_name]
 
 	ranking_label.text = text
 
