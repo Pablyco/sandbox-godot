@@ -22,7 +22,8 @@ func _create_character_buttons() -> void:
 	for c in characters:
 		var btn = Button.new()
 		btn.text = c.display_name
-		btn.custom_minimum_size = Vector2(160, 50)
+		btn.custom_minimum_size = Vector2(170, 52)
+		btn.add_theme_font_size_override("font_size", 18)
 		btn.toggle_mode = true
 		btn.pressed.connect(_on_character_pressed.bind(c, btn))
 		grid.add_child(btn)

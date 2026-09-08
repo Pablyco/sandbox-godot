@@ -19,6 +19,7 @@ const KNOCKBACK_FORCE: float = 180.0
 const KNOCKBACK_DAMPING: float = 420.0
 const KNOCKBACK_MAX_SPEED: float = 240.0
 const SPRITE_DISPLAY_SIZE: float = 90.0
+var base_scale: Vector2 = Vector2.ONE
 var move_speed: float = 120.0
 var velocity_vec: Vector2 = Vector2.ZERO
 var knockback_velocity: Vector2 = Vector2.ZERO
@@ -43,6 +44,7 @@ var accuracy_debuff_timer: float = 0.0
 var is_stunned: bool = false
 var stun_timer: float = 0.0
 var blocked_next_attack: bool = false
+var ability_anim_pending: bool = false
 
 @onready var sprite: Sprite2D = $SpriteContainer/Sprite
 @onready var sprite_container: Node2D = $SpriteContainer
@@ -71,7 +73,8 @@ func _load_sprite_textures() -> void:
 			var tex_size = tex.get_size()
 			if tex_size.x > 0:
 				var scale = SPRITE_DISPLAY_SIZE / maxf(tex_size.x, tex_size.y)
-				sprite.scale = Vector2.ONE * scale
+				base_scale = Vector2.ONE * scale
+				sprite.scale = base_scale
 
 func _get_world_viewport_rect() -> Rect2:
 	var cam = get_viewport().get_camera_2d()
@@ -534,7 +537,7 @@ func _get_damage_number_scene():
 
 func _update_sprite_scale() -> void:
 	# El flip se aplica al contenedor; los tweens de squash van al Sprite hijo
-	if sprite_container:
+	if sprite_container and not ability_anim_pending:
 		var target_scale = Vector2.ONE
 		var motion = velocity_vec.length() / maxf(move_speed, 1.0)
 		if motion > 0.2:
@@ -573,8 +576,8 @@ func _update_ui() -> void:
 func _juice_hit() -> void:
 	if sprite:
 		var tween = create_tween()
-		tween.tween_property(sprite, "scale", Vector2(1.2, 0.8), 0.05)
-		tween.tween_property(sprite, "scale", Vector2.ONE, 0.1)
+		tween.tween_property(sprite, "scale", base_scale * Vector2(1.2, 0.8), 0.05)
+		tween.tween_property(sprite, "scale", base_scale, 0.1)
 
 func _juice_knockback() -> void:
 	if sprite:
@@ -585,8 +588,8 @@ func _juice_knockback() -> void:
 func _juice_pulse() -> void:
 	if sprite:
 		var tween = create_tween()
-		tween.tween_property(sprite, "scale", Vector2(1.3, 1.3), 0.1)
-		tween.tween_property(sprite, "scale", Vector2.ONE, 0.15)
+		tween.tween_property(sprite, "scale", base_scale * 1.3, 0.1)
+		tween.tween_property(sprite, "scale", base_scale, 0.15)
 
 func _juice_death() -> void:
 	if sprite:
@@ -611,8 +614,8 @@ func _juice_spin() -> void:
 func _juice_vomit() -> void:
 	if sprite:
 		var tween = create_tween()
-		tween.tween_property(sprite, "scale", Vector2(1.0, 0.7), 0.1)
-		tween.tween_property(sprite, "scale", Vector2.ONE, 0.2)
+		tween.tween_property(sprite, "scale", base_scale * Vector2(1.0, 0.7), 0.1)
+		tween.tween_property(sprite, "scale", base_scale, 0.2)
 
 func _juice_sleep() -> void:
 	if sprite:
@@ -623,14 +626,14 @@ func _juice_sleep() -> void:
 func _juice_dash() -> void:
 	if sprite:
 		var tween = create_tween()
-		tween.tween_property(sprite, "scale", Vector2(0.5, 1.5), 0.05)
-		tween.tween_property(sprite, "scale", Vector2.ONE, 0.15)
+		tween.tween_property(sprite, "scale", base_scale * Vector2(0.5, 1.5), 0.05)
+		tween.tween_property(sprite, "scale", base_scale, 0.15)
 
 func _juice_slam() -> void:
 	if sprite:
 		var tween = create_tween()
-		tween.tween_property(sprite, "scale", Vector2(1.5, 0.5), 0.1)
-		tween.tween_property(sprite, "scale", Vector2.ONE, 0.2)
+		tween.tween_property(sprite, "scale", base_scale * Vector2(1.5, 0.5), 0.1)
+		tween.tween_property(sprite, "scale", base_scale, 0.2)
 
 func _juice_taunt() -> void:
 	if self:
@@ -674,6 +677,7 @@ func _play_ability_animation() -> void:
 		return
 	var base_tex = sprite.texture
 	var base_modulate = sprite.modulate
+	ability_anim_pending = true
 	sprite.texture = ability_tex
 	var tex_size = ability_tex.get_size()
 	if tex_size.x > 0:
@@ -683,16 +687,14 @@ func _play_ability_animation() -> void:
 	sprite_container.scale = Vector2(1.15 * facing, 1.15)
 	await get_tree().create_timer(0.4).timeout
 	if not is_alive:
+		ability_anim_pending = false
 		return
 	_restore_base_sprite(base_tex, base_modulate)
+	ability_anim_pending = false
 
 func _restore_base_sprite(base_tex: Texture2D, base_modulate: Color) -> void:
 	if not sprite:
 		return
 	sprite.texture = base_tex
-	if base_tex:
-		var tex_size = base_tex.get_size()
-		if tex_size.x > 0:
-			var s = SPRITE_DISPLAY_SIZE / maxf(tex_size.x, tex_size.y)
-			sprite.scale = Vector2.ONE * s
+	sprite.scale = base_scale
 	sprite.modulate = base_modulate

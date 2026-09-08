@@ -12,7 +12,7 @@ func _on_start_pressed() -> void:
 	var gs = get_node_or_null("/root/GameState")
 	if gs:
 		gs.battlefield_characters = CharacterDatabase.get_all_characters()
-		gs.placement_order = []
+		gs.placement_order.clear()
 	get_tree().change_scene_to_file("res://scenes/battlefield/battlefield_battle.tscn")
 
 func _on_back_pressed() -> void:
