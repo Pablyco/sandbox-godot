@@ -1,36 +1,42 @@
-[gd_scene load_steps=4 format=3 uid="uid://vs001"]
+[gd_scene format=3 uid="uid://vs001"]
 
-[ext_resource type="Script" path="res://scripts/ui/versus_select.gd" id="1"]
-[ext_resource type="Texture2D" path="res://resources/bg/bg.svg" id="2_bg"]
-[ext_resource type="Theme" path="res://resources/ui/main_theme.tres" id="3_theme"]
+[ext_resource type="Script" uid="uid://cinsfgxaprq2i" path="res://scripts/ui/versus_select.gd" id="1"]
+[ext_resource type="Texture2D" uid="uid://cs4tbyskmhcox" path="res://resources/bg/bg.svg" id="2_bg"]
+[ext_resource type="Theme" uid="uid://o6gsvtjrakrh" path="res://resources/ui/main_theme.tres" id="3_theme"]
 
-[node name="VersusSelect" type="Control"]
+[node name="VersusSelect" type="Control" unique_id=1887061554]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 theme = ExtResource("3_theme")
 script = ExtResource("1")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="TextureRect" parent="." unique_id=1451588435]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
 texture = ExtResource("2_bg")
 expand_mode = 1
 stretch_mode = 1
-mouse_filter = 2
 
-[node name="Dim" type="ColorRect" parent="."]
+[node name="Dim" type="ColorRect" parent="." unique_id=1951063407]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.05, 0.04, 0.1, 0.55)
+grow_horizontal = 2
+grow_vertical = 2
 mouse_filter = 2
+color = Color(0.05, 0.04, 0.1, 0.55)
 
-[node name="PanelContainer" type="PanelContainer" parent="."]
+[node name="PanelContainer" type="PanelContainer" parent="." unique_id=1048152814]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -39,105 +45,111 @@ offset_left = 40.0
 offset_top = 40.0
 offset_right = -40.0
 offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer" unique_id=90401823]
 layout_mode = 2
 
-[node name="TitleLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+[node name="TitleLabel" type="Label" parent="PanelContainer/VBoxContainer" unique_id=1316141007]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
+theme_override_font_sizes/font_size = 42
 text = "SELECT YOUR FIGHTERS"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 42
-theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 
-[node name="SelectionLabel" type="Label" parent="PanelContainer/VBoxContainer"]
+[node name="SelectionLabel" type="Label" parent="PanelContainer/VBoxContainer" unique_id=199249284]
 layout_mode = 2
+theme_override_colors/font_color = Color(0.9, 0.9, 1, 1)
 text = "Select 2 fighters (0/2)"
 horizontal_alignment = 1
-theme_override_colors/font_color = Color(0.9, 0.9, 1, 1)
 
-[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer"]
+[node name="GridContainer" type="GridContainer" parent="PanelContainer/VBoxContainer" unique_id=272186549]
 layout_mode = 2
 size_flags_vertical = 3
 columns = 5
 
-[node name="Previews" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+[node name="Previews" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=681287262]
 layout_mode = 2
 alignment = 1
 
-[node name="PreviewP1" type="PanelContainer" parent="PanelContainer/VBoxContainer/Previews"]
+[node name="PreviewP1" type="PanelContainer" parent="PanelContainer/VBoxContainer/Previews" unique_id=900216462]
 custom_minimum_size = Vector2(300, 120)
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/Previews/PreviewP1"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/Previews/PreviewP1" unique_id=827917109]
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP1/VBoxContainer"]
+[node name="NameLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP1/VBoxContainer" unique_id=305687932]
 layout_mode = 2
 text = "---"
 horizontal_alignment = 1
 
-[node name="RoleLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP1/VBoxContainer"]
+[node name="RoleLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP1/VBoxContainer" unique_id=190633241]
 layout_mode = 2
-text = ""
 horizontal_alignment = 1
 
-[node name="StatsLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP1/VBoxContainer"]
+[node name="StatsLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP1/VBoxContainer" unique_id=992346900]
 layout_mode = 2
-text = ""
 horizontal_alignment = 1
 
-[node name="AbilityLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP1/VBoxContainer"]
+[node name="AbilityLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP1/VBoxContainer" unique_id=1775047222]
 layout_mode = 2
-text = ""
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="VSPreview" type="Label" parent="PanelContainer/VBoxContainer/Previews"]
+[node name="VSPreview" type="Label" parent="PanelContainer/VBoxContainer/Previews" unique_id=261619822]
 layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 text = " VS "
 vertical_alignment = 1
-theme_override_colors/font_color = Color(1, 0.85, 0.3, 1)
 
-[node name="PreviewP2" type="PanelContainer" parent="PanelContainer/VBoxContainer/Previews"]
+[node name="PreviewP2" type="PanelContainer" parent="PanelContainer/VBoxContainer/Previews" unique_id=306054031]
 custom_minimum_size = Vector2(300, 120)
 layout_mode = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/Previews/PreviewP2"]
+[node name="VBoxContainer" type="VBoxContainer" parent="PanelContainer/VBoxContainer/Previews/PreviewP2" unique_id=349062549]
 layout_mode = 2
 
-[node name="NameLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP2/VBoxContainer"]
+[node name="NameLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP2/VBoxContainer" unique_id=1882073034]
 layout_mode = 2
 text = "---"
 horizontal_alignment = 1
 
-[node name="RoleLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP2/VBoxContainer"]
+[node name="RoleLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP2/VBoxContainer" unique_id=1213383852]
 layout_mode = 2
-text = ""
 horizontal_alignment = 1
 
-[node name="StatsLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP2/VBoxContainer"]
+[node name="StatsLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP2/VBoxContainer" unique_id=1551657154]
 layout_mode = 2
-text = ""
 horizontal_alignment = 1
 
-[node name="AbilityLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP2/VBoxContainer"]
+[node name="AbilityLabel" type="Label" parent="PanelContainer/VBoxContainer/Previews/PreviewP2/VBoxContainer" unique_id=1931323319]
 layout_mode = 2
-text = ""
 horizontal_alignment = 1
 autowrap_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="PanelContainer/VBoxContainer" unique_id=2030460802]
 layout_mode = 2
 alignment = 1
 
-[node name="BackButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="BackButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1032897476]
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
 text = "BACK"
 
-[node name="FightButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer"]
+[node name="FightButton" type="Button" parent="PanelContainer/VBoxContainer/HBoxContainer" unique_id=1991064990]
 custom_minimum_size = Vector2(150, 50)
 layout_mode = 2
-text = "FIGHT!"
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_colors/font_focus_color = Color(0, 0, 0, 1)
+theme_override_colors/font_pressed_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_color = Color(0, 0, 0, 1)
+theme_override_colors/font_hover_pressed_color = Color(0, 0, 0, 1)
 disabled = true
+text = "FIGHT!"

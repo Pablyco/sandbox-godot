@@ -1,53 +1,53 @@
-[gd_resource type="Theme" load_steps=8 format=3]
+[gd_resource type="Theme" format=3 uid="uid://o6gsvtjrakrh"]
 
-[ext_resource type="Texture2D" path="res://resources/ui/btn_normal.svg" id="1_btn_normal"]
-[ext_resource type="Texture2D" path="res://resources/ui/btn_hover.svg" id="2_btn_hover"]
-[ext_resource type="Texture2D" path="res://resources/ui/btn_pressed.svg" id="3_btn_pressed"]
+[ext_resource type="Texture2D" uid="uid://ev42wfuabr0y" path="res://resources/ui/btn_normal.svg" id="1_btn_normal"]
+[ext_resource type="Texture2D" uid="uid://djuray1lsam4i" path="res://resources/ui/btn_hover.svg" id="2_btn_hover"]
+[ext_resource type="Texture2D" uid="uid://d0qcrxdnboma1" path="res://resources/ui/btn_pressed.svg" id="3_btn_pressed"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_normal"]
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_disabled"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
 texture = ExtResource("1_btn_normal")
 texture_margin_left = 24.0
 texture_margin_top = 16.0
 texture_margin_right = 24.0
 texture_margin_bottom = 16.0
+modulate_color = Color(0.45, 0.45, 0.45, 0.6)
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_normal"]
 content_margin_left = 20.0
 content_margin_top = 10.0
 content_margin_right = 20.0
 content_margin_bottom = 10.0
+texture = ExtResource("1_btn_normal")
+texture_margin_left = 24.0
+texture_margin_top = 16.0
+texture_margin_right = 24.0
+texture_margin_bottom = 16.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_hover"]
+content_margin_left = 20.0
+content_margin_top = 10.0
+content_margin_right = 20.0
+content_margin_bottom = 10.0
 texture = ExtResource("2_btn_hover")
 texture_margin_left = 24.0
 texture_margin_top = 16.0
 texture_margin_right = 24.0
 texture_margin_bottom = 16.0
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pressed"]
 content_margin_left = 20.0
 content_margin_top = 10.0
 content_margin_right = 20.0
 content_margin_bottom = 10.0
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_pressed"]
 texture = ExtResource("3_btn_pressed")
 texture_margin_left = 24.0
 texture_margin_top = 16.0
 texture_margin_right = 24.0
 texture_margin_bottom = 16.0
-content_margin_left = 20.0
-content_margin_top = 10.0
-content_margin_right = 20.0
-content_margin_bottom = 10.0
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_disabled"]
-texture = ExtResource("1_btn_normal")
-texture_margin_left = 24.0
-texture_margin_top = 16.0
-texture_margin_right = 24.0
-texture_margin_bottom = 16.0
-content_margin_left = 20.0
-content_margin_top = 10.0
-content_margin_right = 20.0
-content_margin_bottom = 10.0
-modulate_color = Color(0.45, 0.45, 0.45, 0.6)
 
 [resource]
 Button/colors/disabled_font_color = Color(0.5, 0.5, 0.5, 0.8)
