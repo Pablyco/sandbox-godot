@@ -16,7 +16,9 @@ var is_alive: bool = true
 # Movimiento
 const MELEE_RANGE: float = 70.0
 const KNOCKBACK_FORCE: float = 180.0
-const KNOCKBACK_DAMPING: float = 6.0
+const KNOCKBACK_DAMPING: float = 420.0
+const KNOCKBACK_MAX_SPEED: float = 240.0
+const SPRITE_DISPLAY_SIZE: float = 90.0
 var move_speed: float = 120.0
 var velocity_vec: Vector2 = Vector2.ZERO
 var knockback_velocity: Vector2 = Vector2.ZERO
@@ -42,7 +44,7 @@ var is_stunned: bool = false
 var stun_timer: float = 0.0
 var blocked_next_attack: bool = false
 
-@onready var sprite: ColorRect = $SpriteContainer/Sprite
+@onready var sprite: Sprite2D = $SpriteContainer/Sprite
 @onready var sprite_container: Node2D = $SpriteContainer
 @onready var health_bar: ProgressBar = $HealthBar
 @onready var name_label: Label = $NameLabel
@@ -55,7 +57,45 @@ func setup(char_data: CharacterData) -> void:
 	attack_timer = 1.0 / data.attack_speed
 	ability_timer = data.ability_cooldown * randf_range(0.3, 1.0)
 	move_speed = data.move_speed
+	_load_sprite_textures()
 	_update_ui()
+
+func _load_sprite_textures() -> void:
+	if not sprite:
+		return
+	if data.sprite_path != "":
+		var tex = load(data.sprite_path)
+		if tex is Texture2D:
+			sprite.texture = tex
+			sprite.centered = true
+			var tex_size = tex.get_size()
+			if tex_size.x > 0:
+				var scale = SPRITE_DISPLAY_SIZE / maxf(tex_size.x, tex_size.y)
+				sprite.scale = Vector2.ONE * scale
+
+func _get_world_viewport_rect() -> Rect2:
+	var cam = get_viewport().get_camera_2d()
+	if cam == null:
+		return Rect2()
+	var view_size = get_viewport().get_visible_rect().size / cam.zoom
+	return Rect2(cam.global_position - view_size / 2.0, view_size)
+
+func _apply_boundary() -> void:
+	var rect = _get_world_viewport_rect()
+	if rect.size.x <= 0 or rect.size.y <= 0:
+		return
+	if global_position.x < rect.position.x:
+		global_position.x = rect.position.x
+		knockback_velocity.x = absf(knockback_velocity.x)
+	elif global_position.x > rect.end.x:
+		global_position.x = rect.end.x
+		knockback_velocity.x = -absf(knockback_velocity.x)
+	if global_position.y < rect.position.y:
+		global_position.y = rect.position.y
+		knockback_velocity.y = absf(knockback_velocity.y)
+	elif global_position.y > rect.end.y:
+		global_position.y = rect.end.y
+		knockback_velocity.y = -absf(knockback_velocity.y)
 
 func _physics_process(delta: float) -> void:
 	if not is_alive:
@@ -81,8 +121,9 @@ func _physics_process(delta: float) -> void:
 	elif not is_stunned:
 		velocity_vec = Vector2.ZERO
 
-	# Aplicar knockback (decae con el tiempo)
+	# Aplicar knockback (decae con el tiempo, con cap de velocidad)
 	if knockback_velocity.length() > 5:
+		knockback_velocity = knockback_velocity.limit_length(KNOCKBACK_MAX_SPEED)
 		velocity_vec += knockback_velocity
 		knockback_velocity = knockback_velocity.move_toward(Vector2.ZERO, KNOCKBACK_DAMPING * delta)
 	else:
@@ -94,6 +135,7 @@ func _physics_process(delta: float) -> void:
 	velocity = velocity_vec
 	move_and_slide()
 
+	_apply_boundary()
 	_update_sprite_scale()
 	_update_ui()
 
@@ -243,6 +285,7 @@ func _ability_pompompurin() -> void:
 	rage_damage_mult = 1.8
 	_show_ability_text("ATE MY PUDDING!")
 	_show_heal_number(max_health * 0.15)
+	_play_ability_animation()
 	_juice_enrage()
 
 func _ability_pochacco() -> void:
@@ -254,6 +297,7 @@ func _ability_pochacco() -> void:
 		var kb_dir = (target.global_position - global_position).normalized()
 		target._apply_knockback(kb_dir, KNOCKBACK_FORCE * 2.0)
 		_show_ability_text("OLÉ!")
+		_play_ability_animation()
 		_attack_towards(target.global_position)
 
 func _ability_badtz() -> void:
@@ -265,6 +309,7 @@ func _ability_badtz() -> void:
 			var kb_dir = (e.global_position - global_position).normalized()
 			e._apply_knockback(kb_dir, KNOCKBACK_FORCE)
 	_show_ability_text("SPIN KICK!")
+	_play_ability_animation()
 	_juice_spin()
 
 func _ability_hangyodon() -> void:
@@ -273,6 +318,7 @@ func _ability_hangyodon() -> void:
 		e.accuracy_debuff = 0.4
 		e.accuracy_debuff_timer = 4.0
 	_show_ability_text("BITTER DRINK!")
+	_play_ability_animation()
 	_juice_vomit()
 
 func _ability_melody() -> void:
@@ -282,6 +328,7 @@ func _ability_melody() -> void:
 		target.charmed_by = self
 		target.charm_timer = 3.0
 		_show_ability_text("CHARM~")
+		_play_ability_animation()
 		_show_charm_effect(target)
 
 func _ability_gudetama() -> void:
@@ -292,6 +339,7 @@ func _ability_gudetama() -> void:
 			e.slow_timer = 4.0
 			e.slow_amount = 0.6
 	_show_ability_text("NAPS TIME...")
+	_play_ability_animation()
 	_juice_sleep()
 
 func _ability_cinnamoroll() -> void:
@@ -303,6 +351,7 @@ func _ability_cinnamoroll() -> void:
 		var kb_dir = (target.global_position - global_position).normalized()
 		target._apply_knockback(kb_dir, KNOCKBACK_FORCE * 2.5)
 		_show_ability_text("KAMIKAZE!")
+		_play_ability_animation()
 		_attack_towards(target.global_position)
 		_juice_dash()
 
@@ -315,18 +364,21 @@ func _ability_tuxedosam() -> void:
 			var kb_dir = Vector2.UP + (e.global_position - global_position).normalized() * 0.3
 			e._apply_knockback(kb_dir.normalized(), KNOCKBACK_FORCE * 1.8)
 	_show_ability_text("PLANCHAAA!")
+	_play_ability_animation()
 	_juice_slam()
 
 func _ability_kuromi() -> void:
 	is_counter_stance = true
 	counter_timer = 3.0
 	_show_ability_text("HIT ME!?")
+	_play_ability_animation()
 	_juice_taunt()
 
 func _ability_kitty() -> void:
 	is_demon_mode = true
 	demon_timer = 3.0
 	_show_ability_text("DEMON MODE")
+	_play_ability_animation()
 	_juice_demon()
 	for e in _get_all_enemies():
 		for i in range(5):
@@ -499,15 +551,22 @@ func _update_ui() -> void:
 	if name_label:
 		name_label.text = data.display_name
 	if sprite:
-		sprite.color = data.color if is_alive else data.color.darkened(0.5)
-		if rage_mode:
-			sprite.color = data.color.lightened(0.3)
-		if is_demon_mode:
-			sprite.color = Color(1, 0, 0)
-		if is_counter_stance:
-			sprite.color = Color(0.8, 0.2, 1.0)
-		if is_stunned:
-			sprite.color = data.color.darkened(0.3)
+		if not is_alive:
+			sprite.modulate = data.color.darkened(0.5)
+		elif rage_mode:
+			sprite.modulate = data.color.lightened(0.3)
+		elif is_demon_mode:
+			sprite.modulate = Color(1, 0.2, 0.2)
+		elif is_counter_stance:
+			sprite.modulate = Color(0.8, 0.2, 1.0)
+		elif is_charmed:
+			sprite.modulate = Color(1, 0.5, 0.8)
+		elif is_stunned:
+			sprite.modulate = data.color.darkened(0.3)
+		elif is_slowed:
+			sprite.modulate = Color(0.5, 0.6, 1.0)
+		else:
+			sprite.modulate = Color.WHITE
 
 # --- JUICE ---
 
@@ -538,10 +597,10 @@ func _juice_death() -> void:
 		tween.chain().tween_callback(queue_free)
 
 func _juice_enrage() -> void:
-	if sprite:
+	if self:
 		var tween = create_tween().set_loops(5)
-		tween.tween_property(sprite, "modulate", Color(1, 0.5, 0), 0.1)
-		tween.tween_property(sprite, "modulate", Color.WHITE, 0.1)
+		tween.tween_property(self, "self_modulate", Color(1, 0.5, 0), 0.1)
+		tween.tween_property(self, "self_modulate", Color.WHITE, 0.1)
 
 func _juice_spin() -> void:
 	if sprite:
@@ -574,16 +633,16 @@ func _juice_slam() -> void:
 		tween.tween_property(sprite, "scale", Vector2.ONE, 0.2)
 
 func _juice_taunt() -> void:
-	if sprite:
+	if self:
 		var tween = create_tween().set_loops(3)
-		tween.tween_property(sprite, "position:x", sprite.position.x + 5, 0.05)
-		tween.tween_property(sprite, "position:x", sprite.position.x - 5, 0.05)
+		tween.tween_property(self, "self_modulate", Color(1, 0.8, 1.0), 0.05)
+		tween.tween_property(self, "self_modulate", Color.WHITE, 0.05)
 
 func _juice_demon() -> void:
-	if sprite:
+	if self:
 		var tween = create_tween().set_loops(3)
-		tween.tween_property(sprite, "modulate", Color(1, 0, 0), 0.1)
-		tween.tween_property(sprite, "modulate", Color(1, 0.5, 0.5), 0.1)
+		tween.tween_property(self, "self_modulate", Color(1, 0.1, 0.1), 0.1)
+		tween.tween_property(self, "self_modulate", Color(1, 0.4, 0.4), 0.1)
 
 func _juice_attack_animation(target: Fighter) -> void:
 	if sprite:
@@ -604,3 +663,36 @@ func _attack_towards(target_pos: Vector2) -> void:
 		var tween = create_tween()
 		tween.tween_property(sprite, "position", sprite.position + direction * 30, 0.08)
 		tween.tween_property(sprite, "position", sprite.position, 0.08)
+
+# --- ABILITY ANIMATIONS ---
+
+func _play_ability_animation() -> void:
+	if not sprite or data.ability_sprite_path == "":
+		return
+	var ability_tex = load(data.ability_sprite_path)
+	if ability_tex is not Texture2D:
+		return
+	var base_tex = sprite.texture
+	var base_modulate = sprite.modulate
+	sprite.texture = ability_tex
+	var tex_size = ability_tex.get_size()
+	if tex_size.x > 0:
+		var s = SPRITE_DISPLAY_SIZE / maxf(tex_size.x, tex_size.y)
+		sprite.scale = Vector2.ONE * s
+	sprite.modulate = Color.WHITE
+	sprite_container.scale = Vector2(1.15 * facing, 1.15)
+	await get_tree().create_timer(0.4).timeout
+	if not is_alive:
+		return
+	_restore_base_sprite(base_tex, base_modulate)
+
+func _restore_base_sprite(base_tex: Texture2D, base_modulate: Color) -> void:
+	if not sprite:
+		return
+	sprite.texture = base_tex
+	if base_tex:
+		var tex_size = base_tex.get_size()
+		if tex_size.x > 0:
+			var s = SPRITE_DISPLAY_SIZE / maxf(tex_size.x, tex_size.y)
+			sprite.scale = Vector2.ONE * s
+	sprite.modulate = base_modulate

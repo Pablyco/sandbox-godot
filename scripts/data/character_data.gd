@@ -14,3 +14,5 @@ extends Resource
 @export var ability_cooldown: float = 5.0
 @export var ability_description: String = ""
 @export var move_speed: float = 120.0
+@export var sprite_path: String = ""
+@export var ability_sprite_path: String = ""

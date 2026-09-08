@@ -1,6 +1,21 @@
 class_name CharacterDatabase
 extends RefCounted
 
+const ART_PATH: String = "res://resources/characters/"
+
+static func get_art_file_name(char_id: String) -> String:
+	match char_id:
+		"badtz":
+			return "badtz-maru"
+		"melody":
+			return "mymelody"
+		"cinnamoroll":
+			return "cinnamonroll"
+		"kitty":
+			return "hellokitty"
+		_:
+			return char_id
+
 static func get_all_characters() -> Array[CharacterData]:
 	var characters: Array[CharacterData] = []
 
@@ -183,6 +198,11 @@ static func get_all_characters() -> Array[CharacterData]:
 	kitty.ability_description = "Rips off the bow: red eyes, hypervelocity punch combo on everyone"
 	kitty.move_speed = 130.0
 	characters.append(kitty)
+
+	for c in characters:
+		var art_file = get_art_file_name(c.id)
+		c.sprite_path = ART_PATH + art_file + ".png"
+		c.ability_sprite_path = ART_PATH + art_file + "_ability.png"
 
 	return characters
 
