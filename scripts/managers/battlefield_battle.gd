@@ -5,6 +5,7 @@ var fighters: Array[Fighter] = []
 var alive_count: int = 0
 var placement_order: Array[CharacterData] = []
 var battle_over: bool = false
+var _ranking_update_timer: float = 0.0
 
 @onready var camera: Camera2D = $Camera2D
 @onready var fighters_node: Node2D = $Fighters
@@ -75,30 +76,32 @@ func _on_fighter_died(dead_fighter: Fighter) -> void:
 func _end_battle() -> void:
 	battle_over = true
 
-	var winner_data: CharacterData = null
+	var winner_fighter: Fighter = null
 	for f in fighters:
 		if f.is_alive:
-			winner_data = f.data
+			winner_fighter = f
 			break
 
-	if winner_data:
-		placement_order.append(winner_data)
+	if winner_fighter and winner_fighter.data:
+		placement_order.append(winner_fighter.data)
 
 	Engine.time_scale = 0.15
 	await get_tree().create_timer(0.8, true, false, true).timeout
 	Engine.time_scale = 1.0
 
-	_show_victory_screen(winner_data)
+	_show_victory_screen(winner_fighter)
 
-func _show_victory_screen(winner_data: CharacterData) -> void:
-	if victory_screen == null or winner_data == null:
+func _show_victory_screen(winner_fighter: Fighter) -> void:
+	if victory_screen == null or winner_fighter == null:
 		return
+	var winner_data: CharacterData = winner_fighter.data
 
 	victory_screen.visible = true
 	ranking_panel.visible = false
 
 	var name_label = victory_screen.get_node_or_null("VBoxContainer/NameLabel")
 	var sprite_rect = victory_screen.get_node_or_null("VBoxContainer/SpriteRect")
+	var texture_rect = victory_screen.get_node_or_null("VBoxContainer/TextureRect")
 	var subtitle = victory_screen.get_node_or_null("VBoxContainer/SubtitleLabel")
 	var ranking_text = victory_screen.get_node_or_null("VBoxContainer/RankingText")
 
@@ -107,6 +110,8 @@ func _show_victory_screen(winner_data: CharacterData) -> void:
 		name_label.add_theme_color_override("font_color", winner_data.color)
 	if sprite_rect:
 		sprite_rect.color = winner_data.color
+	if texture_rect:
+		texture_rect.texture = winner_fighter.sprite.texture
 	if subtitle:
 		subtitle.text = "CHAMPION!"
 	if ranking_text:
@@ -143,6 +148,13 @@ func _update_ranking() -> void:
 		if f.is_alive:
 			alive_fighters.append(f)
 
+	alive_fighters.sort_custom(func(a: Fighter, b: Fighter) -> bool:
+		var hp_a = a.current_health / maxf(a.max_health, 1.0)
+		var hp_b = b.current_health / maxf(b.max_health, 1.0)
+		if absf(hp_a - hp_b) < 0.0001:
+			return a.data.display_name < b.data.display_name
+		return hp_a > hp_b)
+
 	for i in range(alive_fighters.size()):
 		var f = alive_fighters[i]
 		var pct = int(f.current_health / f.max_health * 100)
@@ -157,3 +169,11 @@ func _update_ranking() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		get_tree().change_scene_to_file("res://scenes/main_menu/main_menu.tscn")
+
+func _process(delta: float) -> void:
+	if battle_over:
+		return
+	_ranking_update_timer += delta
+	if _ranking_update_timer >= 0.25:
+		_ranking_update_timer = 0.0
+		_update_ranking()

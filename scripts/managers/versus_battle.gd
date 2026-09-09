@@ -64,6 +64,7 @@ func _show_victory_screen() -> void:
 
 	var name_label = victory_screen.get_node_or_null("VBoxContainer/NameLabel")
 	var sprite_rect = victory_screen.get_node_or_null("VBoxContainer/SpriteRect")
+	var texture_rect = victory_screen.get_node_or_null("VBoxContainer/TextureRect")
 	var subtitle = victory_screen.get_node_or_null("VBoxContainer/SubtitleLabel")
 
 	if name_label and winner and winner.data:
@@ -71,6 +72,8 @@ func _show_victory_screen() -> void:
 		name_label.add_theme_color_override("font_color", winner.data.color)
 	if sprite_rect and winner and winner.data:
 		sprite_rect.color = winner.data.color
+	if texture_rect and winner and winner.data:
+		texture_rect.texture = winner.sprite.texture
 	if subtitle:
 		subtitle.text = "WINS!"
 

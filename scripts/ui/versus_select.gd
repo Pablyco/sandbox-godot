@@ -22,11 +22,8 @@ func _create_character_buttons() -> void:
 	for c in characters:
 		var btn = Button.new()
 		btn.text = c.display_name
-		btn.add_theme_color_override("font_color", c.color)
-		btn.add_theme_color_override("font_focus_color", c.color)
-		btn.add_theme_color_override("font_pressed_color", c.color)
-		btn.add_theme_color_override("font_hover_color", c.color)
-		btn.add_theme_color_override("font_hover_pressed_color", c.color)
+		btn.add_theme_color_override("font_color", Color.BLACK)
+		btn.modulate = c.color
 		btn.custom_minimum_size = Vector2(170, 52)
 		btn.add_theme_font_size_override("font_size", 18)
 		btn.toggle_mode = true
