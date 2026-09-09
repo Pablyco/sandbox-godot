@@ -4,7 +4,7 @@ var fighter_scene = preload("res://scenes/characters/fighter.tscn")
 var fighters: Array[Fighter] = []
 var alive_count: int = 0
 var placement_order: Array[CharacterData] = []
-var death_positions: Dictionary = {} # instance_id -> position at death
+var death_positions: Dictionary = {} # CharacterData -> position at death
 var battle_over: bool = false
 var _ranking_update_timer: float = 0.0
 
@@ -41,7 +41,7 @@ func _spawn_fighters() -> void:
 		f.global_position = pos
 		fighters_node.add_child(f)
 		f.setup(c)
-		f.died.connect(_on_fighter_died.bind(f))
+		f.died.connect(_on_fighter_died)
 		fighters.append(f)
 
 	alive_count = fighters.size()
@@ -70,14 +70,18 @@ func _on_fighter_died(dead_fighter: Fighter) -> void:
 	if battle_over:
 		return
 	alive_count -= 1
-	placement_order.append(dead_fighter.data)
-	death_positions[dead_fighter.data] = alive_count + 1
+	var pos = alive_count + 1
+	if not placement_order.has(dead_fighter.data):
+		placement_order.append(dead_fighter.data)
+		death_positions[dead_fighter.data] = pos
 	_update_ranking()
 
 	if alive_count <= 1:
 		_end_battle()
 
 func _end_battle() -> void:
+	if battle_over:
+		return
 	battle_over = true
 
 	var winner_fighter: Fighter = null
@@ -86,19 +90,25 @@ func _end_battle() -> void:
 			winner_fighter = f
 			break
 
-	if winner_fighter and winner_fighter.data:
-		placement_order.append(winner_fighter.data)
+	var winner_data: CharacterData = null
+	if winner_fighter:
+		winner_data = winner_fighter.data
+	elif placement_order.size() > 0:
+		winner_data = placement_order[placement_order.size() - 1]
 
 	Engine.time_scale = 0.15
 	await get_tree().create_timer(0.8, true, false, true).timeout
 	Engine.time_scale = 1.0
 
-	_show_victory_screen(winner_fighter)
+	_show_victory_screen(winner_fighter, winner_data)
 
-func _show_victory_screen(winner_fighter: Fighter) -> void:
-	if victory_screen == null or winner_fighter == null:
+func _show_victory_screen(winner_fighter: Fighter, winner_data: CharacterData = null) -> void:
+	if victory_screen == null:
 		return
-	var winner_data: CharacterData = winner_fighter.data
+	if winner_data == null:
+		if winner_fighter == null or winner_fighter.data == null:
+			return
+		winner_data = winner_fighter.data
 
 	victory_screen.visible = true
 	ranking_panel.visible = false
@@ -113,7 +123,7 @@ func _show_victory_screen(winner_fighter: Fighter) -> void:
 		name_label.add_theme_color_override("font_color", winner_data.color)
 	if sprite_rect:
 		sprite_rect.color = winner_data.color
-	if texture_rect:
+	if texture_rect and winner_fighter:
 		texture_rect.texture = winner_fighter.sprite.texture
 	if subtitle:
 		subtitle.text = "WINS!"
@@ -158,7 +168,7 @@ func _update_ranking() -> void:
 		text += "#%d %s [HP %d%%]\n" % [i + 1, f.data.display_name, pct]
 
 	for data in placement_order:
-		var pos = death_positions.get(data, 0)
+		var pos = death_positions.get(data, alive_fighters.size() + placement_order.find(data) + 1)
 		text += "#%d %s [HP 0%%]\n" % [pos, data.display_name]
 
 	ranking_label.text = text
