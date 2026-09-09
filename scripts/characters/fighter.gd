@@ -597,7 +597,13 @@ func _juice_death() -> void:
 		tween.set_parallel(true)
 		tween.tween_property(sprite, "modulate:a", 0.0, 0.5)
 		tween.tween_property(sprite, "rotation", deg_to_rad(90), 0.5)
-		tween.chain().tween_callback(queue_free)
+		tween.chain().tween_callback(_hide_after_death)
+
+func _hide_after_death() -> void:
+	visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
+	set_deferred("collision_layer", 0)
+	set_deferred("collision_mask", 0)
 
 func _juice_enrage() -> void:
 	if self:
