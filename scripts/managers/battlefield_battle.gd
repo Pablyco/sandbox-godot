@@ -4,6 +4,7 @@ var fighter_scene = preload("res://scenes/characters/fighter.tscn")
 var fighters: Array[Fighter] = []
 var alive_count: int = 0
 var placement_order: Array[CharacterData] = []
+var death_positions: Dictionary = {} # instance_id -> position at death
 var battle_over: bool = false
 var _ranking_update_timer: float = 0.0
 
@@ -66,8 +67,11 @@ func _setup_camera() -> void:
 		camera.make_current()
 
 func _on_fighter_died(dead_fighter: Fighter) -> void:
+	if battle_over:
+		return
 	alive_count -= 1
 	placement_order.append(dead_fighter.data)
+	death_positions[dead_fighter.data] = alive_count + 1
 	_update_ranking()
 
 	if alive_count <= 1:
@@ -103,7 +107,6 @@ func _show_victory_screen(winner_fighter: Fighter) -> void:
 	var sprite_rect = victory_screen.get_node_or_null("VBoxContainer/SpriteRect")
 	var texture_rect = victory_screen.get_node_or_null("VBoxContainer/TextureRect")
 	var subtitle = victory_screen.get_node_or_null("VBoxContainer/SubtitleLabel")
-	var ranking_text = victory_screen.get_node_or_null("VBoxContainer/RankingText")
 
 	if name_label:
 		name_label.text = winner_data.display_name
@@ -113,13 +116,7 @@ func _show_victory_screen(winner_fighter: Fighter) -> void:
 	if texture_rect:
 		texture_rect.texture = winner_fighter.sprite.texture
 	if subtitle:
-		subtitle.text = "CHAMPION!"
-	if ranking_text:
-		var rt = ""
-		for i in range(placement_order.size()):
-			var place = placement_order.size() - i
-			rt += "#%d %s\n" % [place, placement_order[i].display_name]
-		ranking_text.text = rt
+		subtitle.text = "WINS!"
 
 	_animate_victory()
 
@@ -130,13 +127,13 @@ func _animate_victory() -> void:
 	if name_label:
 		name_label.scale = Vector2.ZERO
 		var tween = create_tween()
-		tween.tween_property(name_label, "scale", Vector2(1.2, 1.2), 0.4).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
+		tween.tween_property(name_label, "scale", Vector2(1.2, 1.2), 0.3).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_BACK)
 		tween.tween_property(name_label, "scale", Vector2.ONE, 0.2)
 
 	if sprite_rect:
 		sprite_rect.scale = Vector2.ZERO
 		var tween2 = create_tween()
-		tween2.tween_property(sprite_rect, "scale", Vector2(1.5, 1.5), 0.6).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_ELASTIC)
+		tween2.tween_property(sprite_rect, "scale", Vector2(1.5, 1.5), 0.5).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_ELASTIC)
 		tween2.tween_property(sprite_rect, "scale", Vector2.ONE, 0.2)
 
 func _update_ranking() -> void:
@@ -160,9 +157,9 @@ func _update_ranking() -> void:
 		var pct = int(f.current_health / f.max_health * 100)
 		text += "#%d %s [HP %d%%]\n" % [i + 1, f.data.display_name, pct]
 
-	for i in range(placement_order.size()):
-		var place = alive_fighters.size() + i + 1
-		text += "#%d %s [ELIMINATED]\n" % [place, placement_order[i].display_name]
+	for data in placement_order:
+		var pos = death_positions.get(data, 0)
+		text += "#%d %s [HP 0%%]\n" % [pos, data.display_name]
 
 	ranking_label.text = text
 
